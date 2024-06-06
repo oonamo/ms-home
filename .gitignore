@@ -1,3 +1,4 @@
 *.exe
 *.o
 .cache/**
+compile_commands.json
