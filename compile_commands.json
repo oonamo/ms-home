@@ -1,0 +1,7 @@
+[	
+	{
+		"directory": "C:\\Users\\onam7\\projects\\manage_my_home",
+		"command": "gcc C:\\Users\\onam7\\projects\\manage_my_home\\src\\main.c -LC:\\gcc-lua-install\\lua\\bin -llua54 -IC:\\gcc-lua-install\\lua\\include -o mmh",
+		"file": "C:\\Users\\onam7\\projects\\manage_my_home\\src\\main.c"
+	}
+]
