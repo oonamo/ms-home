@@ -1,6 +1,6 @@
 # Manage My Home
 ## Setup
-Install lua using these [instructions](http://lua-users.org/wiki/BuildingLuaInWindowsForNewbies)
+Install lua using these [Instructions](http://lua-users.org/wiki/BuildingLuaInWindowsForNewbies)
 
 ```
 # in root directory
