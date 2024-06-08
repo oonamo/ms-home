@@ -7,6 +7,16 @@
 
 #define LOCAL_PATH "\\AppData\\Local\\ms_home\\conf.lua"
 
+void error(lua_State *L, const char *fmt, ...)
+{
+    va_list argp;
+    va_start(argp, fmt);
+    vfprintf(stderr, fmt, argp);
+    va_end(argp);
+    lua_close(L);
+    exit(EXIT_FAILURE);
+}
+
 bool file_exists(const char *filename)
 {
     FILE *fp = fopen(filename, "r");
@@ -28,14 +38,32 @@ char *get_conf_path(void)
     return conf_path;
 }
 
-static int addTwo(lua_State *L)
+static int l_run(lua_State *L)
 {
-    int lhs = lua_tonumber(L, 1);
-    int rhs = lua_tonumber(L, 2);
+    const char *command = lua_tostring(L, 1);
+    printf("command: %s\n", command);
+    if (!lua_istable(L, 2))
+    {
+        return luaL_error(L, "Expected table as second paramater");
+    }
+    const int argc = lua_rawlen(L, 2);
 
-    lua_pushnumber(L, lhs + rhs);
+    char *argv[argc];
+    for (int i = 1; i <= argc; i++)
+    {
+        lua_pushinteger(L, i);
+        lua_gettable(L, 2);
+        const char *value = lua_tostring(L, -1);
+        printf("Val %s at idx %d\n", value, i);
+        argv[i - 1] =
+            (char *)value; // WARN: argument cannot be altered, do not mutate
+        lua_pop(L, 1);     // remove value
+    }
 
-    return 1;
+    for (int i = 0; i < argc; i++)
+        printf("arg %d is %s\n", i, argv[i]);
+    // TODO: pass arguements to system
+    return 0;
 }
 
 void create_default_conf(const char *path)
@@ -47,10 +75,10 @@ static void init_lua_state(lua_State *L)
 {
     lua_newtable(L);                // mmh
     luaL_dofile(L, "lua/home.lua"); // mmh lua functions
-    lua_pushcfunction(L, &addTwo);
-    lua_setfield(L, -2, "addTwo"); // test function
+    lua_pushcfunction(L, &l_run);
+    lua_setfield(L, -2, "run");
     lua_setglobal(L, "home");
-    lua_settop(L, 0); // set stack at the bottom
+    lua_settop(L, 0); // empty the stack
 }
 
 int main(void)
@@ -67,6 +95,7 @@ int main(void)
     {
         // TODO: Create default file
         printf("file does not exist.. creating default\n");
+        create_default_conf(path);
         return -1;
     }
 
@@ -87,5 +116,6 @@ int main(void)
         printf("there was error reading user file");
 
     lua_close(L);
+    printf("closing...\n");
     return 0;
 }
