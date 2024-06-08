@@ -6,7 +6,15 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define LOCAL_PATH "\\AppData\\Local\\ms_home\\conf.lua"
+#ifdef _WIN32
+#define CONFIG_VAR "USERPROFILE"
+#define CONFIG_EXT "\\AppData\\Local\\ms_home\\conf.lua"
+#else
+// TODO: fallback to $HOME
+// also check if this is actually the right var...
+#define CONFIG_VAR "XDG_CONFIG_HOME"
+#define CONFIG_EXT "/ms_home/conf.lua"
+#endif
 
 // from lua docs
 void error(lua_State *L, const char *fmt, ...)
@@ -33,10 +41,10 @@ bool file_exists(const char *filename)
 
 char *get_conf_path(void)
 {
-    char *home = getenv("USERPROFILE");
+    char *home = getenv(CONFIG_VAR);
     if (home == NULL)
         return NULL;
-    char *conf_path = strcat(home, LOCAL_PATH);
+    char *conf_path = strcat(home, CONFIG_EXT);
     return conf_path;
 }
 
@@ -106,6 +114,5 @@ int main(int argc, char *argv[])
         printf("there was error reading user file\n");
 
     lua_close(L);
-    /* printf("closing...\n"); */
     return 0;
 }

@@ -10,6 +10,7 @@
 ---@field display fun(self)
 ---@field runners Runner[]
 ---@field run fun(command: string)
+---@field data table|nil
 local home = {}
 
 function home:new(data)
@@ -19,6 +20,8 @@ function home:new(data)
 	return self
 end
 
+--- Print all runners
+---
 function home:display() end
 
 function home:create_runner(name, command)
