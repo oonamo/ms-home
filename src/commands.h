@@ -4,15 +4,18 @@ typedef enum
 {
     ACTION_DEFAULT,
     ACTION_EVALUATE,
+    ACTION_SEND_ARGS,
+    ACTION_EXECTUTE_RUNNER,
 } Action;
 
 typedef struct
 {
     Action action;
     char *path;
+    char *args[];
 } Arguments;
 
-typedef struct ActionMap
+typedef struct
 {
     const char *action_str;
     Action action_enum;
