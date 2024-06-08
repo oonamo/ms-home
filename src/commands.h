@@ -13,7 +13,7 @@ typedef struct
 {
     Action action;
     char *path;
-    size_t argc;
+    int argc;
     char *args[];
 } Arguments;
 
@@ -24,6 +24,6 @@ typedef struct
 } ActionMap;
 
 extern const ActionMap ACTION_MAP[];
-
-Arguments parse_args(int argc, char *argv[]);
+void destroy_arguments(Arguments *arg);
+Arguments *parse_flags(int argc, char *argv[]);
 #endif
