@@ -19,13 +19,7 @@ function home:new(data)
 	return self
 end
 
-function home:display()
-	print("from home display")
-end
-
-function home.test(lhs, rhs)
-	return lhs == rhs
-end
+function home:display() end
 
 function home:create_runner(name, command)
 	if not self.runners then

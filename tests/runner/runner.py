@@ -6,7 +6,7 @@ result = subprocess.run(
 result.check_returncode()
 
 if result.stdout == b"done\r\n":
-    print("runner passed")
+    print("success")
     exit(0)
 else:
     print("failed asssert")

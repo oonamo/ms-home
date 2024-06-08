@@ -8,6 +8,7 @@
 
 #define LOCAL_PATH "\\AppData\\Local\\ms_home\\conf.lua"
 
+// from lua docs
 void error(lua_State *L, const char *fmt, ...)
 {
     va_list argp;
@@ -43,9 +44,8 @@ char *get_conf_path(void)
 static int l_run(lua_State *L)
 {
     const char *command = lua_tostring(L, 1);
-    /* printf("command: %s\n", command); */
     system(command);
-    lua_pop(L, 1);
+    lua_pop(L, 1); // remove string from stack
     return 0;
 }
 
@@ -66,21 +66,15 @@ static void init_lua_state(lua_State *L)
 
 int main(int argc, char *argv[])
 {
-    /* printf("starting ...\n"); */
     Arguments args = parse_args(argc, argv);
-    /* printf("Action: %d\n", args.action); */
-    /* printf("Path: %s\n", args.path); */
     const char *path = get_conf_path();
 
     if (args.path)
     {
-        /* printf("using command path\n"); */
         path = args.path;
     }
 
     if (path == NULL)
-    /* printf("conf path: %s\n", path); */
-    /* else */
     {
         fprintf(stderr, "could not find path\n");
         exit(EXIT_FAILURE);
