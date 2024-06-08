@@ -17,14 +17,46 @@
 #endif
 
 // from lua docs
-void error(lua_State *L, const char *fmt, ...)
+void error(lua_State *L, Arguments *a, const char *fmt, ...)
 {
     va_list argp;
     va_start(argp, fmt);
     vfprintf(stderr, fmt, argp);
     va_end(argp);
     lua_close(L);
+    destroy_arguments(a);
     exit(EXIT_FAILURE);
+}
+
+static void stackDump(lua_State *L)
+{
+    int i;
+    int top = lua_gettop(L);
+    for (i = 1; i <= top; i++)
+    { /* repeat for each level */
+        int t = lua_type(L, i);
+        switch (t)
+        {
+
+        case LUA_TSTRING: /* strings */
+            printf("`%s'", lua_tostring(L, i));
+            break;
+
+        case LUA_TBOOLEAN: /* booleans */
+            printf(lua_toboolean(L, i) ? "true" : "false");
+            break;
+
+        case LUA_TNUMBER: /* numbers */
+            printf("%g", lua_tonumber(L, i));
+            break;
+
+        default: /* other values */
+            printf("%s", lua_typename(L, t));
+            break;
+        }
+        printf("  "); /* put a separator */
+    }
+    printf("\n"); /* end the listing */
 }
 
 bool file_exists(const char *filename)
@@ -52,6 +84,7 @@ char *get_conf_path(void)
 static int l_run(lua_State *L)
 {
     const char *command = lua_tostring(L, 1);
+    /* printf("cmd: %s\n", command); */
     system(command);
     lua_pop(L, 1); // remove string from stack
     return 0;
@@ -74,12 +107,12 @@ static void init_lua_state(lua_State *L)
 
 int main(int argc, char *argv[])
 {
-    Arguments args = parse_args(argc, argv);
+    Arguments *args = parse_flags(argc, argv);
     const char *path = get_conf_path();
 
-    if (args.path)
+    if (args->path != NULL)
     {
-        path = args.path;
+        path = args->path;
     }
 
     if (path == NULL)
@@ -109,10 +142,63 @@ int main(int argc, char *argv[])
 
     // Run Config
     ok ^= luaL_dofile(L, path);
+    if (args->action == ACTION_EXECTUTE_RUNNER)
+    {
+        if (*args->args == NULL)
+            error(L, args, "no runner name, bad program\n");
+        const char *runner_name = args->args[0];
+
+        // home table
+        lua_getglobal(L, "home");
+        if (!lua_istable(L, -1))
+            error(L, args, "'background' is not a table");
+        lua_pushstring(L, "runners");
+        lua_gettable(L, -2); // home.runners
+        int runner_count = lua_rawlen(L, -1);
+        for (int i = 1; i <= runner_count; i++)
+        {
+            lua_rawgeti(L, -1, i); // home.runners[i]
+            if (lua_istable(L, -1))
+            {
+                lua_pushstring(L, "name");
+                lua_gettable(L, -2); // home.runners[i].name
+                const char *name = lua_tostring(L, -1);
+                lua_pop(L, 1); // pop "name"
+
+                if (strcmp(runner_name, name) == 0)
+                {
+                    lua_pushstring(L, "command");
+                    lua_gettable(L, -2); // home.runners[i].command
+                    const char *command = lua_tostring(L, -1);
+                    lua_replace(L, 1); // move command to bottom of the stack
+                    l_run(L);
+                    break;
+                }
+            }
+            lua_pop(L, 1); // pop home.runner[i]
+        }
+        lua_close(L);
+        destroy_arguments(args);
+        /* printf("completed \n"); */
+        exit(EXIT_SUCCESS);
+    }
+
+    /* switch (args->action) */
+    /* { */
+    /* case ACTION_DEFAULT: */
+    /*     break; */
+    /* case ACTION_EVALUATE: */
+    /*     break; */
+    /* case ACTION_EXECTUTE_RUNNER: */
+    /*     break; */
+    /* case ACTION_SEND_ARGS: */
+    /*     break; */
+    /* } */
 
     if (!ok)
         printf("there was error reading user file\n");
 
     lua_close(L);
+    destroy_arguments(args);
     return 0;
 }

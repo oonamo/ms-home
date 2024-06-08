@@ -1,5 +1,6 @@
 #ifndef COMMAND_H
 #define COMMAND_H
+#include <stdlib.h>
 typedef enum
 {
     ACTION_DEFAULT,
@@ -12,6 +13,7 @@ typedef struct
 {
     Action action;
     char *path;
+    size_t argc;
     char *args[];
 } Arguments;
 

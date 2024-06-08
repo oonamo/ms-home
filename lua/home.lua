@@ -3,7 +3,6 @@
 ---@class Runner
 ---@field name string
 ---@field command string
----@field args string[]
 
 ---@class Home
 ---@field new fun(self, data: table): self
@@ -20,10 +19,6 @@ function home:new(data)
 	return self
 end
 
---- Print all runners
----
-function home:display() end
-
 function home:create_runner(name, command)
 	if not self.runners then
 		self.runners = {}
@@ -34,7 +29,6 @@ end
 function home:execute_runner(name)
 	for _, v in ipairs(self.runners) do
 		if v.name == name then
-			-- print("found runner " .. name)
 			home.run(v.command)
 			return
 		end
