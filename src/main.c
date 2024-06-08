@@ -1,3 +1,4 @@
+#include "commands.c"
 #include <lauxlib.h>
 #include <lua.h>
 #include <lualib.h>
@@ -38,31 +39,13 @@ char *get_conf_path(void)
     return conf_path;
 }
 
+// TODO: Does it need to be a table?
 static int l_run(lua_State *L)
 {
     const char *command = lua_tostring(L, 1);
-    printf("command: %s\n", command);
-    if (!lua_istable(L, 2))
-    {
-        return luaL_error(L, "Expected table as second paramater");
-    }
-    const int argc = lua_rawlen(L, 2);
-
-    char *argv[argc];
-    for (int i = 1; i <= argc; i++)
-    {
-        lua_pushinteger(L, i);
-        lua_gettable(L, 2);
-        const char *value = lua_tostring(L, -1);
-        printf("Val %s at idx %d\n", value, i);
-        argv[i - 1] =
-            (char *)value; // WARN: argument cannot be altered, do not mutate
-        lua_pop(L, 1);     // remove value
-    }
-
-    for (int i = 0; i < argc; i++)
-        printf("arg %d is %s\n", i, argv[i]);
-    // TODO: pass arguements to system
+    /* printf("command: %s\n", command); */
+    system(command);
+    lua_pop(L, 1);
     return 0;
 }
 
@@ -81,16 +64,29 @@ static void init_lua_state(lua_State *L)
     lua_settop(L, 0); // empty the stack
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
-
+    /* printf("starting ...\n"); */
+    Arguments args = parse_args(argc, argv);
+    /* printf("Action: %d\n", args.action); */
+    /* printf("Path: %s\n", args.path); */
     const char *path = get_conf_path();
-    if (path)
-        printf("conf path: %s\n", path);
-    else
-        printf("could not find path\n");
-    bool ok = file_exists(path);
 
+    if (args.path)
+    {
+        /* printf("using command path\n"); */
+        path = args.path;
+    }
+
+    if (path == NULL)
+    /* printf("conf path: %s\n", path); */
+    /* else */
+    {
+        fprintf(stderr, "could not find path\n");
+        exit(EXIT_FAILURE);
+    }
+
+    bool ok = file_exists(path);
     if (!ok)
     {
         // TODO: Create default file
@@ -107,15 +103,15 @@ int main(void)
     init_lua_state(L);
 
     if (!ok)
-        printf("there was error");
+        printf("there was error\n");
 
     // Run Config
-    ok &= luaL_dofile(L, path);
+    ok ^= luaL_dofile(L, path);
 
-    if (ok)
-        printf("there was error reading user file");
+    if (!ok)
+        printf("there was error reading user file\n");
 
     lua_close(L);
-    printf("closing...\n");
+    /* printf("closing...\n"); */
     return 0;
 }
