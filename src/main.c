@@ -80,11 +80,10 @@ char *get_conf_path(void)
     return conf_path;
 }
 
-// TODO: Does it need to be a table?
+// TODO: Return output as string
 static int l_system(lua_State *L)
 {
     const char *command = lua_tostring(L, 1);
-    /* printf("cmd: %s\n", command); */
     system(command);
     lua_pop(L, 1); // remove string from stack
     return 0;

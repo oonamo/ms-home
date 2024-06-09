@@ -32,8 +32,10 @@ function home:execute_runner(name)
 		if v.name == name then
 			if type(v.command) == "function" then
 				v.command()
-			else
+			elseif type(v.command) == "string" then
 				home.system(v.command)
+			else
+				error("unsupported type for execute_runner")
 			end
 			return
 		end
