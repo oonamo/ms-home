@@ -9,8 +9,10 @@
 #ifdef _WIN32
 #define CONFIG_VAR "USERPROFILE"
 #define CONFIG_EXT "\\AppData\\Local\\ms_home\\conf.lua"
+#include "platforms/win.c"
 #else
 // TODO: fallback to $HOME
+// Also Handle diffrent platforms
 // also check if this is actually the right var...
 #define CONFIG_VAR "XDG_CONFIG_HOME"
 #define CONFIG_EXT "/ms_home/conf.lua"
@@ -89,6 +91,16 @@ static int l_system(lua_State *L)
     return 0;
 }
 
+static int get_appearance(lua_State *L)
+{
+    bool is_dark = c_get_appearence();
+    if (is_dark)
+        lua_pushstring(L, "dark");
+    else
+        lua_pushstring(L, "light");
+    return 1;
+}
+
 void create_default_conf(const char *path)
 {
     printf("creating default file at %s\n", path);
@@ -101,6 +113,11 @@ static void init_lua_state(lua_State *L)
     lua_pushcfunction(L, &l_system);
     lua_setfield(L, -2, "system");
     lua_setglobal(L, "home");
+    /* lua_settop(L, 0);                // empty the stack */
+    luaL_dofile(L, "lua/utils.lua"); // add utils table to stack
+    lua_pushcfunction(L, &get_appearance);
+    lua_setfield(L, -2, "get_appearance");
+    lua_setglobal(L, "utils");
     lua_settop(L, 0); // empty the stack
 }
 
@@ -117,6 +134,7 @@ int main(int argc, char *argv[])
     if (path == NULL)
     {
         fprintf(stderr, "could not find path\n");
+        destroy_arguments(args);
         exit(EXIT_FAILURE);
     }
 
@@ -137,7 +155,12 @@ int main(int argc, char *argv[])
     init_lua_state(L);
 
     if (!ok)
+    {
         printf("there was error\n");
+        lua_close(L);
+        destroy_arguments(args);
+        exit(EXIT_FAILURE);
+    }
 
     // Run Config
     ok ^= luaL_dofile(L, path);
@@ -173,7 +196,12 @@ int main(int argc, char *argv[])
     /* } */
 
     if (!ok)
+    {
         printf("there was error reading user file %s\n", path);
+        lua_close(L);
+        destroy_arguments(args);
+        exit(EXIT_FAILURE);
+    }
 
     lua_close(L);
     destroy_arguments(args);
