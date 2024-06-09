@@ -1,28 +1,44 @@
 import subprocess
+from .. import utils
 
-print("running runner tests...")
+
+class Test:
+    def __init__(self, cmd, comp):
+        self.cmd = cmd
+        self.comp = comp
+
+    def test(self):
+        result = subprocess.run(self.cmd, capture_output=True)
+        result.check_returncode()
+        if result.stdout != self.comp:
+            utils.prRed("fail:")
+            utils.prRed("expected:")
+            utils.prRed(self.comp)
+            print("found:")
+            print(result.stdout)
+            return False
+        return True
+
 
 # test system call to command
-result = subprocess.run(
-    ["./ms_home", "-e", "./tests/runner/runner.lua"], capture_output=True
-)
-result.check_returncode()
+tests = [
+    Test(["./ms_home", "-e", "./tests/runner/runner.lua"], b"done\r\n"),
+    Test(
+        ["./ms_home", "-r", "Create Something", "-e", "./tests/runner/runner.lua"],
+        b"done\r\nsomething\r\n",
+    ),
+    Test(
+        ["./ms_home", "-r", "functional", "-e", "./tests/runner/runner.lua"],
+        b"done\r\nfunctional\r\n",
+    ),
+]
 
-if result.stdout != b"done\r\n":
-    print("failed asssert")
-    print(result.stdout)
-    print('expected \'b"done\\r\\n"')
+result = True
+for test in tests:
+    result = test.test()
+
+if result is False:
+    utils.prRed("failed runner.py")
     exit(1)
-print("called system from evalue success")
-
-result = subprocess.run(
-    ["./ms_home", "-r", "Create Something", "-e", "./tests/runner/runner.lua"],
-    capture_output=True,
-)
-
-# runner.lua executes runner that calls "echo done" and then cli calls "echo something"
-if result.stdout != b"done\r\nsomething\r\n":
-    print("failed asssert")
-    print(result.stdout)
-    print('expected \'b"something\\r\\n"')
-    exit(1)
+else:
+    utils.prGreen("passed runner.py")

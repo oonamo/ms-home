@@ -1,10 +1,7 @@
 import subprocess
+from .. import utils
 
-print("running command tests...")
-
-
-def test(cmd, code):
-    return subprocess.run(cmd).returncode == code
+utils.prGreen("testing commands...")
 
 
 class Test:
@@ -29,11 +26,11 @@ for test in tests:
     result = test.run_test()
     # print(result)
     if not result:
-        print("test failed")
-        print("command: " + str(test.test))
+        utils.prRed("test failed")
+        utils.prRed("command: " + str(test.test))
         print("expected: " + str(test.code))
         print("got: " + str(result))
         exit(1)
 
 
-print("success")
+utils.prGreen("passed commands.py")

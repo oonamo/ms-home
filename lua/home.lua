@@ -8,7 +8,7 @@
 ---@field new fun(self, data: table): self
 ---@field display fun(self)
 ---@field runners Runner[]
----@field run fun(command: string)
+---@field system fun(command: string)
 ---@field data table|nil
 ---@field execute_runner fun(self, name: string)
 local home = {}
@@ -30,7 +30,11 @@ end
 function home:execute_runner(name)
 	for _, v in ipairs(self.runners) do
 		if v.name == name then
-			home.run(v.command)
+			if type(v.command) == "function" then
+				v.command()
+			else
+				home.system(v.command)
+			end
 			return
 		end
 	end

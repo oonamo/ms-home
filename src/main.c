@@ -81,7 +81,7 @@ char *get_conf_path(void)
 }
 
 // TODO: Does it need to be a table?
-static int l_run(lua_State *L)
+static int l_system(lua_State *L)
 {
     const char *command = lua_tostring(L, 1);
     /* printf("cmd: %s\n", command); */
@@ -99,8 +99,8 @@ static void init_lua_state(lua_State *L)
 {
     lua_newtable(L);                // mmh
     luaL_dofile(L, "lua/home.lua"); // mmh lua functions
-    lua_pushcfunction(L, &l_run);
-    lua_setfield(L, -2, "run");
+    lua_pushcfunction(L, &l_system);
+    lua_setfield(L, -2, "system");
     lua_setglobal(L, "home");
     lua_settop(L, 0); // empty the stack
 }
@@ -174,7 +174,7 @@ int main(int argc, char *argv[])
     /* } */
 
     if (!ok)
-        printf("there was error reading user file\n");
+        printf("there was error reading user file %s\n", path);
 
     lua_close(L);
     destroy_arguments(args);
