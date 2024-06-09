@@ -4,34 +4,37 @@
 #include <stdlib.h>
 #include <string.h>
 
-const ActionMap ACTION_MAP[] = {{"", ACTION_DEFAULT},
-                                {"e", ACTION_EVALUATE},
-                                {"eval", ACTION_EVALUATE},
-                                {"evaluate", ACTION_EVALUATE},
-                                {"send_args", ACTION_SEND_ARGS}};
-
 Arguments *parse_flags(int argc, char *argv[])
 {
     int opt;
-    Arguments *args = malloc(sizeof(Arguments) + sizeof(char *) * (argc - 1));
+    Arguments *args = malloc(sizeof(Arguments));
     args->path = NULL;
     args->action = ACTION_DEFAULT;
-    args->args[0] = NULL;
+    /* args->args[0] = NULL; */
     args->argc = 1;
-    while ((opt = getopt(argc, argv, "e:r:")) != -1)
+    args->map = malloc((argc - 1) * sizeof(ArgMap));
+    while ((opt = getopt(argc, argv, "e:r:t:")) != -1)
     {
         switch (opt)
         {
         case 'r':
             args->action = ACTION_EXECTUTE_RUNNER;
-            args->args[0] = optarg;
-            args->argc = 1;
+            args->map[args->argc].arg = optarg;
+            args->map[args->argc].action = ACTION_EXECTUTE_RUNNER;
+            args->argc++;
             break;
         case 'e':
             if (args->action == ACTION_DEFAULT)
                 args->action = ACTION_EVALUATE;
             args->path = optarg;
+            args->map[args->argc].arg = optarg;
+            args->map[args->argc].action = ACTION_EVALUATE;
+            args->argc++;
             break;
+        case 't':
+            args->map[args->argc].arg = optarg;
+            args->map[args->argc].action = ACTION_EVALUATE;
+            args->argc++;
         case '?':
         {
             fprintf(stderr, "Usage: %s [-r runner] [-e evaluate]\n", argv[0]);
@@ -44,7 +47,6 @@ Arguments *parse_flags(int argc, char *argv[])
 
 void destroy_arguments(Arguments *arg)
 {
-    for (size_t i = 0; i < arg->argc; i++)
-        free(arg->args[i]);
+    free(arg->map);
     free(arg);
 }

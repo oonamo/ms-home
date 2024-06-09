@@ -1,29 +1,28 @@
 #ifndef COMMAND_H
 #define COMMAND_H
-#include <stdlib.h>
 typedef enum
 {
     ACTION_DEFAULT,
     ACTION_EVALUATE,
     ACTION_SEND_ARGS,
-    ACTION_EXECTUTE_RUNNER,
+    ACTION_EXECTUTE_RUNNER, // TODO: Fix Typo
+    ACTION_EXECUTE_TAG,
 } Action;
 
 typedef struct
 {
+    char *arg;
     Action action;
-    char *path;
-    int argc;
-    char *args[];
-} Arguments;
+} ArgMap;
 
 typedef struct
 {
-    const char *action_str;
-    Action action_enum;
-} ActionMap;
+    Action action;
+    int argc;
+    char *path;
+    ArgMap *map;
+} Arguments;
 
-extern const ActionMap ACTION_MAP[];
 void destroy_arguments(Arguments *arg);
 Arguments *parse_flags(int argc, char *argv[]);
 #endif

@@ -8,6 +8,10 @@ local utils = {}
 ---@field day_night_toggle fun(cb: fun(is_day))
 utils.runners = {}
 
+function utils.runners.day_night_toggle(cb)
+	local cur_appearence = utils.get_appearance()
+end
+
 ---@class ColorTools
 utils.colors = {}
 

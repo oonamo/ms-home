@@ -164,23 +164,35 @@ int main(int argc, char *argv[])
 
     // Run Config
     ok ^= luaL_dofile(L, path);
-    if (args->action == ACTION_EXECTUTE_RUNNER)
+    if (args->map == NULL)
     {
-        if (*args->args == NULL)
-            error(L, args, "no runner name, bad program\n");
-        const char *runner_name = args->args[0];
+        error(L, args, "how did we get here");
+    }
+    for (int i = 0; i < args->argc; i++)
+    {
+        if (args->map[i].action == ACTION_EXECTUTE_RUNNER ||
+            args->map[i].action == ACTION_EXECUTE_TAG)
+        {
+            const char *search_for = args->map[i].arg;
 
-        // home table
-        lua_getglobal(L, "home");
-        if (!lua_istable(L, -1))
-            error(L, args, "'home' is not a table");
-        lua_getfield(L, -1, "execute_runner");
-        lua_pushvalue(L, -2);           // home table (aka self)
-        lua_pushstring(L, runner_name); // name
-        lua_pcall(L, 2, 0, 0);          // home.execute_runner(self, name)
-        lua_close(L);
-        destroy_arguments(args);
-        exit(EXIT_SUCCESS);
+            // home table
+            lua_getglobal(L, "home");
+            if (!lua_istable(L, -1))
+                error(L, args, "'home' is not a table");
+            if (args->map[i].action == ACTION_EXECTUTE_RUNNER)
+                lua_getfield(L, -1, "execute_runner");
+            else
+                lua_getfield(L, -1, "execute_tag");
+
+            lua_pushvalue(L, -2);          // home table (aka self)
+            lua_pushstring(L, search_for); // name or tag
+            lua_pcall(L, 2, 0, 0); // home.execute_runner(self, name)  or
+                                   // home.execute_tag(self, tag)
+            lua_settop(L, 0);
+            /* lua_close(L); */
+            /* destroy_arguments(args); */
+            /* exit(EXIT_SUCCESS); */
+        }
     }
 
     /* switch (args->action) */
