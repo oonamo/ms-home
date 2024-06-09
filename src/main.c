@@ -151,35 +151,13 @@ int main(int argc, char *argv[])
         // home table
         lua_getglobal(L, "home");
         if (!lua_istable(L, -1))
-            error(L, args, "'background' is not a table");
-        lua_pushstring(L, "runners");
-        lua_gettable(L, -2); // home.runners
-        int runner_count = lua_rawlen(L, -1);
-        for (int i = 1; i <= runner_count; i++)
-        {
-            lua_rawgeti(L, -1, i); // home.runners[i]
-            if (lua_istable(L, -1))
-            {
-                lua_pushstring(L, "name");
-                lua_gettable(L, -2); // home.runners[i].name
-                const char *name = lua_tostring(L, -1);
-                lua_pop(L, 1); // pop "name"
-
-                if (strcmp(runner_name, name) == 0)
-                {
-                    lua_pushstring(L, "command");
-                    lua_gettable(L, -2); // home.runners[i].command
-                    const char *command = lua_tostring(L, -1);
-                    lua_replace(L, 1); // move command to bottom of the stack
-                    l_run(L);
-                    break;
-                }
-            }
-            lua_pop(L, 1); // pop home.runner[i]
-        }
+            error(L, args, "'home' is not a table");
+        lua_getfield(L, -1, "execute_runner");
+        lua_pushvalue(L, -2);           // home table (aka self)
+        lua_pushstring(L, runner_name); // name
+        lua_pcall(L, 2, 0, 0);          // home.execute_runner(self, name)
         lua_close(L);
         destroy_arguments(args);
-        /* printf("completed \n"); */
         exit(EXIT_SUCCESS);
     }
 
