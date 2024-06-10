@@ -121,6 +121,48 @@ static void init_lua_state(lua_State *L)
     lua_settop(L, 0); // empty the stack
 }
 
+static void execute_tag_runner(lua_State *L, Arguments *args, const char *home,
+                               const char *tag_runner, int idx)
+{
+    lua_getglobal(L, "Homes");
+    if (!lua_istable(L, -1))
+        error(L, args,
+              "Global 'Homes' was overwritten. Please remove any reference to "
+              "'Home' in your config.\n");
+    int home_c = lua_rawlen(L, -1);
+    bool matched = false;
+    for (int i = 1; i <= home_c; i++)
+    {
+        lua_rawgeti(L, -1, i);       // Homes[i]
+        lua_getfield(L, -1, "name"); // Homes[i].name
+        const char *home_name = lua_tostring(L, -1);
+        lua_pop(L, 1); // pop name, Homes[i] will be ontop
+        if (strcmp(home_name, home) == 0)
+        {
+            if (args->map[i].action == ACTION_EXECUTE_RUNNER)
+                lua_getfield(L, -1, "execute_runner");
+            else
+                lua_getfield(L, -1, "execute_tag");
+            lua_pushvalue(L,
+                          -2); // push Homes[i] to the top of the stack
+            lua_pushstring(L, tag_runner);
+            int err = lua_pcall(L, 2, 0,
+                                0); // Homes[i].execute_runner(self, name)
+            if (err)
+                error(L, args,
+                      "There was an error executing your runner/tag:\n\t%s\n",
+                      lua_tostring(L, -1));
+            lua_settop(L, 0);
+            matched = true;
+            break;
+        }
+        lua_pop(L, 1);
+    }
+
+    if (!matched)
+        error(L, args, "Did not find home '%s'\n", home);
+}
+
 int main(int argc, char *argv[])
 {
     Arguments *args = parse_flags(argc, argv);
@@ -161,65 +203,24 @@ int main(int argc, char *argv[])
               lua_tostring(L, -1));
     if (args->map == NULL)
     {
-        error(L, args, "how did we get here");
+        error(L, args, "how did we get here\n");
     }
     for (int i = 0; i < args->argc; i++)
     {
 
         const char *home = args->home;
-        /* switch (args->map[i].action) */
-        /* { */
-        /* case ACTION_EXECTUTE_RUNNER: */
-        /* case ACTION_EXECUTE_TAG: */
-        /* { */
-        /*     break; */
-        /* } */
-        /* case ACTION_SEND_ARGS: */
-        /*     break; */
-        /* case ACTION_DEFAULT: */
-        /*     break; */
-        /* case ACTION_EVALUATE: */
-        /*     break; */
-        /* } */
-        if (args->map[i].action == ACTION_EXECUTE_RUNNER ||
-            args->map[i].action == ACTION_EXECUTE_TAG)
+        switch (args->map[i].action)
         {
-            const char *search_for = args->map[i].arg;
-            lua_getglobal(L, "Homes");
-            if (!lua_istable(L, -1))
-                error(L, args, "Global Homes table was overwritten");
-            int home_c = lua_rawlen(L, -1);
-            bool matched = false;
-            for (int i = 1; i <= home_c; i++)
-            {
-                lua_rawgeti(L, -1, i);       // Homes[i]
-                lua_getfield(L, -1, "name"); // Homes[i].name
-                const char *home_name = lua_tostring(L, -1);
-                lua_pop(L, 1); // pop name, Homes[i] will be ontop
-                if (strcmp(home_name, home) == 0)
-                {
-                    if (args->map[i].action == ACTION_EXECUTE_RUNNER)
-                        lua_getfield(L, -1, "execute_runner");
-                    else
-                        lua_getfield(L, -1, "execute_tag");
-                    lua_pushvalue(L,
-                                  -2); // push Homes[i] to the top of the stack
-                    lua_pushstring(L, search_for);
-                    int err =
-                        lua_pcall(L, 2, 0,
-                                  0); // Homes[i].execute_runner(self, name)
-                    if (err)
-                        error(L, args, "error executing tag/runner:\n\t%s\n",
-                              lua_tostring(L, -1));
-                    lua_settop(L, 0);
-                    matched = true;
-                    break;
-                }
-                lua_pop(L, 1);
-            }
-
-            if (!matched)
-                error(L, args, "did not find home %s", home);
+        case ACTION_EXECUTE_RUNNER:
+        case ACTION_EXECUTE_TAG:
+        {
+            execute_tag_runner(L, args, home, args->map[i].arg, i);
+            break;
+        }
+        case ACTION_SEND_ARGS:
+        case ACTION_DEFAULT:
+        case ACTION_EVALUATE:
+            break;
         }
     }
     lua_close(L);
