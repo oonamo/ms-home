@@ -170,6 +170,21 @@ int main(int argc, char *argv[])
     }
     for (int i = 0; i < args->argc; i++)
     {
+        /* switch (args->map[i].action) */
+        /* { */
+        /* case ACTION_EXECTUTE_RUNNER: */
+        /* case ACTION_EXECUTE_TAG: */
+        /* { */
+        /*     break; */
+        /* } */
+        /* case ACTION_SEND_ARGS: */
+        /*     break; */
+        /* case ACTION_DEFAULT: */
+        /*     break; */
+        /* case ACTION_EVALUATE: */
+        /*     break; */
+        /* } */
+        // TODO: Handle cases where multiple homes may exist in a file
         if (args->map[i].action == ACTION_EXECTUTE_RUNNER ||
             args->map[i].action == ACTION_EXECUTE_TAG)
         {
@@ -189,23 +204,8 @@ int main(int argc, char *argv[])
             lua_pcall(L, 2, 0, 0); // home.execute_runner(self, name)  or
                                    // home.execute_tag(self, tag)
             lua_settop(L, 0);
-            /* lua_close(L); */
-            /* destroy_arguments(args); */
-            /* exit(EXIT_SUCCESS); */
         }
     }
-
-    /* switch (args->action) */
-    /* { */
-    /* case ACTION_DEFAULT: */
-    /*     break; */
-    /* case ACTION_EVALUATE: */
-    /*     break; */
-    /* case ACTION_EXECTUTE_RUNNER: */
-    /*     break; */
-    /* case ACTION_SEND_ARGS: */
-    /*     break; */
-    /* } */
 
     if (!ok)
     {

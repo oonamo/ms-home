@@ -19,7 +19,9 @@ function home:new(data)
 	data = data or {}
 	setmetatable(data, self)
 	self.__index = self
-	return self
+	-- TODO: used to return self
+	-- Handle cases where multiple homes may be defined
+	return data
 end
 
 function home:create_runner(name, command, tag)
