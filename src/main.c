@@ -192,10 +192,10 @@ int main(int argc, char *argv[])
             bool matched = false;
             for (int i = 1; i <= home_c; i++)
             {
-                lua_rawgeti(L, -1, i);       // home[i]
-                lua_getfield(L, -1, "name"); // home[i].name
+                lua_rawgeti(L, -1, i);       // Homes[i]
+                lua_getfield(L, -1, "name"); // Homes[i].name
                 const char *home_name = lua_tostring(L, -1);
-                lua_pop(L, 1); // pop name, home[i] will be ontop
+                lua_pop(L, 1); // pop name, Homes[i] will be ontop
                 if (strcmp(home_name, home) == 0)
                 {
                     if (args->map[i].action == ACTION_EXECUTE_RUNNER)
@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
                     else
                         lua_getfield(L, -1, "execute_tag");
                     lua_pushvalue(L,
-                                  -2); // push Home[i] to the top of the stack
+                                  -2); // push Homes[i] to the top of the stack
                     lua_pushstring(L, search_for);
                     int err =
                         lua_pcall(L, 2, 0,
