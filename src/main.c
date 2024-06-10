@@ -186,27 +186,35 @@ int main(int argc, char *argv[])
         /* case ACTION_EVALUATE: */
         /*     break; */
         /* } */
-        // TODO: Handle cases where multiple homes may exist in a file
         if (args->map[i].action == ACTION_EXECTUTE_RUNNER ||
             args->map[i].action == ACTION_EXECUTE_TAG)
         {
             const char *search_for = args->map[i].arg;
-
-            // TODO: get global Homes instead
-            // home table
-            lua_getglobal(L, "home");
+            lua_getglobal(L, "Homes");
             if (!lua_istable(L, -1))
-                error(L, args, "'home' is not a table");
-            if (args->map[i].action == ACTION_EXECTUTE_RUNNER)
-                lua_getfield(L, -1, "execute_runner");
-            else
-                lua_getfield(L, -1, "execute_tag");
-
-            lua_pushvalue(L, -2);          // home table (aka self)
-            lua_pushstring(L, search_for); // name or tag
-            lua_pcall(L, 2, 0, 0); // home.execute_runner(self, name)  or
-                                   // home.execute_tag(self, tag)
-            lua_settop(L, 0);
+                error(L, args, "Global Homes table was overwritten");
+            int home_c = lua_rawlen(L, -1);
+            for (int i = 1; i <= home_c; i++)
+            {
+                lua_rawgeti(L, -1, i);       // home[i]
+                lua_getfield(L, -1, "name"); // home[i].name
+                const char *home_name = lua_tostring(L, -1);
+                lua_pop(L, 1); // pop name, home[i] will be ontop
+                if (strcmp(home_name, home) == 0)
+                {
+                    if (args->map[i].action == ACTION_EXECTUTE_RUNNER)
+                        lua_getfield(L, -1, "execute_runner");
+                    else
+                        lua_getfield(L, -1, "execute_tag");
+                    lua_pushvalue(L,
+                                  -2); // push home[i] to the top of the stack
+                    lua_pushstring(L, search_for);
+                    lua_pcall(L, 2, 0, 0);
+                    lua_settop(L, 0); // empty stack
+                    break;
+                }
+                lua_pop(L, 1);
+            }
         }
     }
 
