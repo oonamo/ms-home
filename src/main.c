@@ -121,6 +121,8 @@ static void init_lua_state(lua_State *L)
     lua_settop(L, 0); // empty the stack
 }
 
+/// Executes Home[idx].execute_runner() if action is ACTION_EXECUTE_RUNNER,
+/// otherwise executes Home[idx].execute_tag()
 static void execute_tag_runner(lua_State *L, Arguments *args, const char *home,
                                const char *tag_runner, int idx)
 {
@@ -166,13 +168,11 @@ static void execute_tag_runner(lua_State *L, Arguments *args, const char *home,
 int main(int argc, char *argv[])
 {
     Arguments *args = parse_flags(argc, argv);
-    const char *path = get_conf_path();
+    char *path = get_conf_path();
     bool err;
 
     if (args->path != NULL)
-    {
         path = args->path;
-    }
 
     if (path == NULL)
     {
