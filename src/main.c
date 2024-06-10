@@ -170,6 +170,8 @@ int main(int argc, char *argv[])
     }
     for (int i = 0; i < args->argc; i++)
     {
+
+        const char *home = args->home;
         /* switch (args->map[i].action) */
         /* { */
         /* case ACTION_EXECTUTE_RUNNER: */
@@ -190,6 +192,7 @@ int main(int argc, char *argv[])
         {
             const char *search_for = args->map[i].arg;
 
+            // TODO: get global Homes instead
             // home table
             lua_getglobal(L, "home");
             if (!lua_istable(L, -1))

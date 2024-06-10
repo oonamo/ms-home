@@ -13,7 +13,7 @@ Arguments *parse_flags(int argc, char *argv[])
     /* args->args[0] = NULL; */
     args->argc = 1;
     args->map = malloc((argc - 1) * sizeof(ArgMap));
-    while ((opt = getopt(argc, argv, "e:r:t:")) != -1)
+    while ((opt = getopt(argc, argv, "e:r:t:h:")) != -1)
     {
         switch (opt)
         {
@@ -21,7 +21,6 @@ Arguments *parse_flags(int argc, char *argv[])
             args->action = ACTION_EXECTUTE_RUNNER;
             args->map[args->argc].arg = optarg;
             args->map[args->argc].action = ACTION_EXECTUTE_RUNNER;
-            args->argc++;
             break;
         case 'e':
             if (args->action == ACTION_DEFAULT)
@@ -29,18 +28,19 @@ Arguments *parse_flags(int argc, char *argv[])
             args->path = optarg;
             args->map[args->argc].arg = optarg;
             args->map[args->argc].action = ACTION_EVALUATE;
-            args->argc++;
             break;
         case 't':
             args->map[args->argc].arg = optarg;
             args->map[args->argc].action = ACTION_EVALUATE;
-            args->argc++;
+        case 'h':
+            args->home = optarg;
         case '?':
         {
             fprintf(stderr, "Usage: %s [-r runner] [-e evaluate]\n", argv[0]);
             exit(EXIT_FAILURE);
         }
         }
+        args->argc++;
     }
     return args;
 }

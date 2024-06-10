@@ -19,6 +19,7 @@ typedef struct
 {
     Action action;
     int argc;
+    char *home;
     char *path;
     ArgMap *map;
 } Arguments;
