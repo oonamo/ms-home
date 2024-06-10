@@ -37,7 +37,7 @@ Arguments *parse_flags(int argc, char *argv[])
             break;
         case 't':
             args->map[args->argc].arg = optarg;
-            args->map[args->argc].action = ACTION_EVALUATE;
+            args->map[args->argc].action = ACTION_EXECUTE_TAG;
             break;
         case 'h':
             args->home = optarg;
