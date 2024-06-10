@@ -24,7 +24,7 @@ class Test:
 
 tests = [
     Test(["./ms_home"], 0),
-    Test(["./ms_home", "-f", "./tests/commands/dne.lua"], 1),
+    Test(["./ms_home", "-f", "./tests/commands/bad_flag.lua.lua"], 1),
     Test(["./ms_home", "-e", "./tests/commands/should_pass.lua"], 0),
     Test(
         ["./ms_home", "-e", "./tests/commands/should_pass.lua", "-t", "test_runner"], 0
@@ -33,18 +33,24 @@ tests = [
         [
             "./ms_home",
             "-e",
-            "./tests/commands/should_pass.lua",
+            "./tests/commands/fake_runner.lua",
             "-t",
             "not_real_runner",
+        ],
+        1,
+    ),
+    Test(
+        [
+            "./ms_home",
+            "-e",
+            "./tests/commands/duplicate_home.lua",
         ],
         1,
     ),
 ]
 
 for test in tests:
-    # print(test.test)
     result = test.run_test()
-    # print(result)
 
 
 utils.prGreen("passed commands.py")

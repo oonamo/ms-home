@@ -44,7 +44,10 @@ Arguments *parse_flags(int argc, char *argv[])
             break;
         case '?':
         {
-            fprintf(stderr, "Usage: %s [-r runner] [-e evaluate]\n", argv[0]);
+            fprintf(stderr,
+                    "Usage: %s [-r runner_name] [-e file] [-h home_name] [-t "
+                    "tag_name]\n",
+                    argv[0]);
             exit(EXIT_FAILURE);
         }
         }
