@@ -8,9 +8,14 @@ Arguments *parse_flags(int argc, char *argv[])
 {
     int opt;
     Arguments *args = malloc(sizeof(Arguments));
+    if (args == NULL)
+    {
+        fprintf(stderr,
+                "failed to allocate memory for Arguments struct, exiting\n");
+        exit(EXIT_FAILURE);
+    }
     args->path = NULL;
     args->action = ACTION_DEFAULT;
-    /* args->args[0] = NULL; */
     args->argc = 1;
     args->map = malloc((argc - 1) * sizeof(ArgMap));
     args->home = "home";
@@ -19,10 +24,9 @@ Arguments *parse_flags(int argc, char *argv[])
         switch (opt)
         {
         case 'r':
-            args->action = ACTION_EXECTUTE_RUNNER;
+            args->action = ACTION_EXECUTE_RUNNER;
             args->map[args->argc].arg = optarg;
-            args->map[args->argc].action = ACTION_EXECTUTE_RUNNER;
-            args->argc++;
+            args->map[args->argc].action = ACTION_EXECUTE_RUNNER;
             break;
         case 'e':
             if (args->action == ACTION_DEFAULT)
@@ -30,16 +34,13 @@ Arguments *parse_flags(int argc, char *argv[])
             args->path = optarg;
             args->map[args->argc].arg = optarg;
             args->map[args->argc].action = ACTION_EVALUATE;
-            args->argc++;
             break;
         case 't':
             args->map[args->argc].arg = optarg;
             args->map[args->argc].action = ACTION_EVALUATE;
-            args->argc++;
             break;
         case 'h':
             args->home = optarg;
-            args->argc++;
             break;
         case '?':
         {
@@ -47,6 +48,7 @@ Arguments *parse_flags(int argc, char *argv[])
             exit(EXIT_FAILURE);
         }
         }
+        args->argc++;
     }
     return args;
 }

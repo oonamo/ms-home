@@ -186,7 +186,7 @@ int main(int argc, char *argv[])
         /* case ACTION_EVALUATE: */
         /*     break; */
         /* } */
-        if (args->map[i].action == ACTION_EXECTUTE_RUNNER ||
+        if (args->map[i].action == ACTION_EXECUTE_RUNNER ||
             args->map[i].action == ACTION_EXECUTE_TAG)
         {
             const char *search_for = args->map[i].arg;
@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
                 lua_pop(L, 1); // pop name, home[i] will be ontop
                 if (strcmp(home_name, home) == 0)
                 {
-                    if (args->map[i].action == ACTION_EXECTUTE_RUNNER)
+                    if (args->map[i].action == ACTION_EXECUTE_RUNNER)
                         lua_getfield(L, -1, "execute_runner");
                     else
                         lua_getfield(L, -1, "execute_tag");

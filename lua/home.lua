@@ -36,8 +36,6 @@ function home:new(name, data)
 	self.__index = self
 	table.insert(Homes, data)
 	data.name = name
-	-- TODO: used to return self
-	-- Handle cases where multiple homes may be defined
 	return data
 end
 
