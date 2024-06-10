@@ -24,6 +24,7 @@ end
 ---@field data table|nil
 ---@field create_runner fun(self, name: string, command: fun()|string, tag: string|nil)
 ---@field execute_runner fun(self, name: string)
+---@field execute_tag fun(self, tag: string)
 local home = {}
 
 function home:new(name, data)

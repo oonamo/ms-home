@@ -2,6 +2,7 @@
 #include <lauxlib.h>
 #include <lua.h>
 #include <lualib.h>
+#include <stdarg.h>
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,7 +19,6 @@
 #define CONFIG_EXT "/ms_home/conf.lua"
 #endif
 
-// from lua docs
 void error(lua_State *L, Arguments *a, const char *fmt, ...)
 {
     va_list argp;
@@ -125,6 +125,7 @@ int main(int argc, char *argv[])
 {
     Arguments *args = parse_flags(argc, argv);
     const char *path = get_conf_path();
+    bool err;
 
     if (args->path != NULL)
     {
@@ -138,8 +139,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    bool ok = file_exists(path);
-    if (!ok)
+    if (!file_exists(path))
     {
         // TODO: Create default file
         printf("file does not exist.. creating default\n");
@@ -154,16 +154,11 @@ int main(int argc, char *argv[])
     luaL_openlibs(L);
     init_lua_state(L);
 
-    if (!ok)
-    {
-        printf("there was error\n");
-        lua_close(L);
-        destroy_arguments(args);
-        exit(EXIT_FAILURE);
-    }
-
     // Run Config
-    ok ^= luaL_dofile(L, path);
+    err = luaL_dofile(L, path);
+    if (err)
+        error(L, args, "there was an error loading %s:\n\t%s\n", path,
+              lua_tostring(L, -1));
     if (args->map == NULL)
     {
         error(L, args, "how did we get here");
@@ -194,6 +189,7 @@ int main(int argc, char *argv[])
             if (!lua_istable(L, -1))
                 error(L, args, "Global Homes table was overwritten");
             int home_c = lua_rawlen(L, -1);
+            bool matched = false;
             for (int i = 1; i <= home_c; i++)
             {
                 lua_rawgeti(L, -1, i);       // home[i]
@@ -207,25 +203,25 @@ int main(int argc, char *argv[])
                     else
                         lua_getfield(L, -1, "execute_tag");
                     lua_pushvalue(L,
-                                  -2); // push home[i] to the top of the stack
+                                  -2); // push Home[i] to the top of the stack
                     lua_pushstring(L, search_for);
-                    lua_pcall(L, 2, 0, 0);
-                    lua_settop(L, 0); // empty stack
+                    int err =
+                        lua_pcall(L, 2, 0,
+                                  0); // Homes[i].execute_runner(self, name)
+                    if (err)
+                        error(L, args, "error executing tag/runner:\n\t%s\n",
+                              lua_tostring(L, -1));
+                    lua_settop(L, 0);
+                    matched = true;
                     break;
                 }
                 lua_pop(L, 1);
             }
+
+            if (!matched)
+                error(L, args, "did not find home %s", home);
         }
     }
-
-    if (!ok)
-    {
-        printf("there was error reading user file %s\n", path);
-        lua_close(L);
-        destroy_arguments(args);
-        exit(EXIT_FAILURE);
-    }
-
     lua_close(L);
     destroy_arguments(args);
     return 0;
