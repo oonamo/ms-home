@@ -27,7 +27,8 @@ jobs:
         make build
         ./install.bat
         Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
-        Add-Content $env:GITHUB_PATH ./bin/creal.exe # add to path
+        # Append to Github Path
+        echo "${HOME}/AppData/Roaming/creal/" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
         refreshenv
         cd ../
     - uses: actions/checkout@v4

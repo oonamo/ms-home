@@ -6,6 +6,8 @@ set INSTALL_DIR=%APPDATA%\ms_home
 if not exist "%INSTALL_DIR%\" (
     echo making folder at "%INSTALL_DIR%"
     mkdir "%INSTALL_DIR%"
+    mkdir "%INSTALL_DIR%\include\"
+    mkdir "%INSTALL_DIR%\include\bin\"
 )
 
 rem TODO: Package executable in release
@@ -13,8 +15,10 @@ make build_local
 
 rem Copy executable
 echo Installing at "%INSTALL_DIR%\"
+echo "copying %~dp0ms_home.exe"
 copy /Y "%~dp0ms_home.exe" "%INSTALL_DIR%\"
-copy /Y "%~dp0include\bin\lua54.dll" "%INSTALL_DIR\"
+echo "copying %~dp0\bin\lua54.exe"
+copy /Y "%~dp0include\bin\lua54.dll" "%INSTALL_DIR\include\bin\"
 
 rem Copy path to a file
 echo %PATH% > "%INSTALL_DIR%\path.bak"
