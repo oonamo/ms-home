@@ -6,7 +6,7 @@ home:create_runner("Create Something", "echo something")
 home:execute_runner("runner")
 
 home:create_runner("functional", function()
-	print("functional")
+  print("functional")
 end)
 
 home:create_runner("wezterm", "echo wezterm", "toggle")
