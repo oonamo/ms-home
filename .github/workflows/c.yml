@@ -21,9 +21,11 @@ jobs:
         path: ./creal
     - name: install creal
       run: |
-        ./creal/install.bat
+        cd ./creal/
+        ./install.bat
         Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
         refreshenv
+        cd ../
     - uses: actions/checkout@v4
     - name: run tests
       run: make test_local
