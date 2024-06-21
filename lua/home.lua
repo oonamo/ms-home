@@ -1,4 +1,7 @@
 --- File containing basic lua api's to mmh
+
+---@private
+---@class Homes
 Homes = {}
 
 local function home_is_uniq(name)
@@ -17,12 +20,12 @@ end
 ---@field tag string
 
 ---@class Home
+---@field name string name of homme
+---@field data table|nil
 ---@field new fun(self, name: string|nil, data: table|nil): self
 ---@field display fun(self)
----@field runners Runner[]
 ---@field system fun(command: string)
----@field data table|nil
----@field create_runner fun(self, name: string, command: fun()|string, tag: string|nil)
+---@field create_runner fun(self, name: string, command: fun()|string, tag: string|nil) Create runner for your home with a name and command to be executed. Optionally, add a tag to group similar runners together
 ---@field execute_runner fun(self, name: string)
 ---@field execute_tag fun(self, tag: string)
 local home = {}
@@ -36,7 +39,7 @@ function home:new(name, data)
 	setmetatable(data, self)
 	self.__index = self
 	table.insert(Homes, data)
-	data.name = name
+	home.name = name
 	return data
 end
 

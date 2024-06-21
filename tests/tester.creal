@@ -1,0 +1,44 @@
+#strict
+#always_show_output [[! To ensure that passes are correct !]]
+#compare_outputs=false
+#verbose
+[[! Commands !]]
+name: fail on bad flag
+command: ms_home -f ./tests/commands/bad_flag.lua
+returncode: 1
+---
+name: launch named runner
+command: ms_home -e ./tests/commands/should_pass.lua -t test_runner
+returncode: 0
+---
+name: fail on fake runner
+command: ms_home -e ./tests/commands/fake_runner.lua -t not_real_runner
+returncode: 1
+---
+name: fail on duplicate home
+command: ms_home -e ./tests/commands/duplicate_home.lua
+returncode: 1
+---
+[[! Runners !]]
+#compare_outputs=true
+name: evaluate test file
+command: ms_home -e ./tests/runner/runner.lua
+returncode: 0
+output: done
+---
+name: run runner Create Something
+command: ms_home -r "Create Something" -e ./tests/runner/runner.lua
+returncode: 0
+output: |
+done
+something
+        |
+---
+name:  run runner functional
+command: ms_home -r "functional" -e ./tests/runner/runner.lua
+returncode: 0
+output: |
+done
+functional
+        |
+---
