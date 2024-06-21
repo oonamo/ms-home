@@ -90,6 +90,10 @@ static int l_system(lua_State *L)
 
 static int get_appearance(lua_State *L)
 {
+#ifndef _WIN32
+  lua_pushstring(L, "dark");
+  return 1;
+#endif
   bool is_dark = c_get_appearence();
   if (is_dark)
     lua_pushstring(L, "dark");
