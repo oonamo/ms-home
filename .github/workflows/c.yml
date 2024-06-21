@@ -22,6 +22,9 @@ jobs:
     - name: install creal
       run: |
         cd ./creal/
+        ls      #debug
+        pwd     #debug
+        make build
         ./install.bat
         Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
         refreshenv
