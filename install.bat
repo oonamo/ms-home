@@ -17,7 +17,7 @@ rem Copy executable
 echo Installing at "%INSTALL_DIR%\"
 echo "copying %~dp0ms_home.exe"
 copy /Y "%~dp0ms_home.exe" "%INSTALL_DIR%\"
-echo "copying %~dp0\bin\lua54.exe"
+echo "copying %~dp0include\bin\lua54.dll"
 copy /Y "%~dp0include\bin\lua54.dll" "%INSTALL_DIR\include\bin\"
 
 rem Copy path to a file
