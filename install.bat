@@ -14,7 +14,7 @@ make build_local
 rem Copy executable
 echo Installing at "%INSTALL_DIR%\"
 copy /Y "%~dp0ms_home.exe" "%INSTALL_DIR%\"
-copy /Y "%~dp0/include/bin/lua54.dll" "%INSTALL_DIR\"
+copy /Y "%~dp0include\bin\lua54.dll" "%INSTALL_DIR\"
 
 rem Copy path to a file
 echo %PATH% > "%INSTALL_DIR%\path.bak"

@@ -27,11 +27,14 @@ jobs:
         make build
         ./install.bat
         Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
+        Add-Content $env:GITHUB_PATH ./bin/creal.exe # add to path
         refreshenv
         cd ../
     - uses: actions/checkout@v4
     - name: run tests
-      run: make test_local
+      run: |
+        ls #debug
+        make test_local
   windows_install:
     runs-on: windows-latest
     steps:
