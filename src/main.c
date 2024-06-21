@@ -16,8 +16,9 @@
 // TODO: fallback to $HOME
 // Also Handle diffrent platforms
 // also check if this is actually the right var...
-# define CONFIG_VAR "XDG_CONFIG_HOME"
-# define CONFIG_EXT "/ms_home/conf.lua"
+# define CONFIG_VAR         "XDG_CONFIG_HOME"
+# define CONFIG_EXT         "/ms_home/conf.lua"
+# define c_get_appearence() 1
 #endif
 
 void error(lua_State *L, Arguments *a, const char *fmt, ...)
