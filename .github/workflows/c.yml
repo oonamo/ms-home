@@ -34,10 +34,13 @@ jobs:
     - uses: actions/checkout@v4
     - name: run tests
       run: |
-        ls #debug
+        ls bin/include/bin # check for dll file
+        make build_local
+        ls # test to see if binary was built
         make test_local
+        ls
         if ($LASTEXITCODE -eq 0) {
-          Write-Output Failed tests
+          Write-Output "Failed tests"
           exit 1
         }
   windows_install:
