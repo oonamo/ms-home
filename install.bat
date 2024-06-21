@@ -9,7 +9,7 @@ if not exist "%INSTALL_DIR%\" (
 )
 
 rem TODO: Package executable in release
-make build_local
+REM make build_local
 
 rem Copy executable
 echo Installing at "%INSTALL_DIR%\"
