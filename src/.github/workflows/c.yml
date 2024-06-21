@@ -1,0 +1,36 @@
+name: C CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  tests:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+    - uses: actions/checkout@v4
+    - name: make
+      run: make
+    - name: run tests
+      run: make run_tests
+  windows_install:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: make creal
+      run: make build
+    - name: run install script
+      run: ./install.bat
+    - name: check installation
+      run: '& "$Env:APPDATA\ms_home\ms_home.exe" ./test/tester.creal'
+    - name: refresh path and test install
+      run: |
+        Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
+        refreshenv
+        ms_home ./tests/tester.creal
