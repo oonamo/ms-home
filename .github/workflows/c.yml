@@ -20,8 +20,18 @@ jobs:
   windows_install:
     runs-on: windows-latest
     steps:
+    - name: clone creal
+      uses: actions/checkout@v4
+      with:
+        repository: oonamo/creal
+        path: /creal
+    - name: install creal
+      run: |
+        ./creal/install.bat
+        Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
+        refreshenv
     - uses: actions/checkout@v4
-    - name: make creal
+    - name: make ms_home
       run: make build_local
     - name: run install script
       run: ./install.bat
