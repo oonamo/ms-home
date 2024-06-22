@@ -18,6 +18,7 @@ jobs:
       uses: actions/checkout@v4
       with:
         repository: oonamo/creal
+        ref: 62ae898
         path: ./creal
     - name: install creal
       run: |

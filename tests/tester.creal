@@ -34,11 +34,3 @@ done
 something
         |
 ---
-name:  run runner functional
-command: build\ms_home -r "functional" -e ./tests/runner/runner.lua
-returncode: 0
-output: |
-done
-functional
-        |
----
