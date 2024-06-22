@@ -6,25 +6,25 @@ typedef enum {
   ACTION_SEND_ARGS,
   ACTION_EXECUTE_RUNNER,
   ACTION_EXECUTE_TAG,
-} Action;
+} action_t;
 
 typedef struct {
   char *arg;
-  Action action;
+  action_t action;
   int allocated;
-} ArgMap;
+} arg_map_t;
 
 typedef struct {
-  Action action;
+  action_t action;
   int argc;
   char *home;
   char *path;
-  ArgMap *map;
-} Arguments;
+  arg_map_t *map;
+} args_t;
 
-void destroy_arguments(Arguments *arg);
-Arguments *parse_flags(int argc, char *argv[]);
+void destroy_arguments(args_t *arg);
+args_t *parse_flags(int argc, char *argv[]);
 
-void arguments_set_arg(Arguments *args, char *optarg);
+void arguments_set_arg(args_t *args, char *optarg);
 
 #endif

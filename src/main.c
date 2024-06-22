@@ -21,7 +21,7 @@
 # define c_get_appearence() 1
 #endif
 
-void error(lua_State *L, Arguments *a, const char *fmt, ...)
+void error(lua_State *L, args_t *a, const char *fmt, ...)
 {
   va_list argp;
   va_start(argp, fmt);
@@ -125,8 +125,8 @@ static void init_lua_state(lua_State *L)
 
 /// Executes Home[idx].execute_runner() if action is ACTION_EXECUTE_RUNNER,
 /// otherwise executes Home[idx].execute_tag()
-static void execute_tag_runner(lua_State *L, Arguments *args, const char *home,
-                               const char *tag_runner, int idx)
+static void execute_tag_runner(lua_State *L, args_t *args, const char *home, const char *tag_runner,
+                               int idx)
 {
   lua_getglobal(L, "Homes");
   if (!lua_istable(L, -1))
@@ -166,9 +166,8 @@ static void execute_tag_runner(lua_State *L, Arguments *args, const char *home,
 
 int main(int argc, char *argv[])
 {
-  Arguments *args = parse_flags(argc, argv);
+  args_t *args = parse_flags(argc, argv);
   char *path = get_conf_path();
-  printf("path: %s\n", path);
   bool err;
 
   if (args->path != NULL) {

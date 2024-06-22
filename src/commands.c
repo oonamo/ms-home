@@ -6,7 +6,7 @@
 
 #include "optarg.c"
 
-void arguments_set_arg(Arguments *args, char *optarg)
+void arguments_set_arg(args_t *args, char *optarg)
 {
   if (args->map[args->argc].allocated) {
     // reallocate
@@ -18,10 +18,10 @@ void arguments_set_arg(Arguments *args, char *optarg)
   args->map[args->argc].allocated = 1;
 }
 
-Arguments *parse_flags(int argc, char *argv[])
+args_t *parse_flags(int argc, char *argv[])
 {
   int opt;
-  Arguments *args = malloc(sizeof(Arguments));
+  args_t *args = malloc(sizeof(args_t));
   if (args == NULL) {
     fprintf(stderr, "failed to allocate memory for Arguments struct, exiting\n");
     exit(EXIT_FAILURE);
@@ -29,7 +29,7 @@ Arguments *parse_flags(int argc, char *argv[])
   args->path = NULL;
   args->action = ACTION_DEFAULT;
   args->argc = 1;
-  args->map = malloc((argc - 1) * sizeof(ArgMap));
+  args->map = malloc((argc - 1) * sizeof(arg_map_t));
   args->map[0].allocated = 0;
 
   // strlen("home") + 1 = 5
@@ -76,7 +76,7 @@ Arguments *parse_flags(int argc, char *argv[])
   return args;
 }
 
-void destroy_arguments(Arguments *args)
+void destroy_arguments(args_t *args)
 {
   for (int i = 0; i < args->argc; i++) {
     if (args->map[i].allocated) {
