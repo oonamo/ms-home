@@ -171,8 +171,9 @@ int main(int argc, char *argv[])
   printf("path: %s\n", path);
   bool err;
 
-  if (args->path != NULL)
-    path = args->path;
+  if (args->path != NULL) {
+    path = strdup(args->path);
+  }
 
   if (path == NULL) {
     fprintf(stderr, "could not find path\n");

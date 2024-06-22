@@ -6,6 +6,18 @@
 
 #include "optarg.c"
 
+void arguments_set_arg(Arguments *args, char *optarg)
+{
+  if (args->map[args->argc].allocated) {
+    // reallocate
+    args->map[args->argc].arg = realloc(args->map[args->argc].arg, strlen(optarg) + 1);
+  } else {
+    args->map[args->argc].arg = malloc(strlen(optarg) + 1);
+  }
+  strcpy(args->map[args->argc].arg, optarg);
+  args->map[args->argc].allocated = 1;
+}
+
 Arguments *parse_flags(int argc, char *argv[])
 {
   int opt;
@@ -18,28 +30,39 @@ Arguments *parse_flags(int argc, char *argv[])
   args->action = ACTION_DEFAULT;
   args->argc = 1;
   args->map = malloc((argc - 1) * sizeof(ArgMap));
-  args->home = "home";
+  args->map[0].allocated = 0;
+
+  // strlen("home") + 1 = 5
+  args->home = malloc((size_t)5);
+  strcpy(args->home, "home");
   while ((opt = getopt(argc, argv, "e:r:t:h:")) != -1) {
+    args->map[args->argc].allocated = 0;
     switch (opt) {
     case 'r':
       args->action = ACTION_EXECUTE_RUNNER;
-      args->map[args->argc].arg = optarg;
+      arguments_set_arg(args, optarg);
       args->map[args->argc].action = ACTION_EXECUTE_RUNNER;
       break;
     case 'e':
       if (args->action == ACTION_DEFAULT)
         args->action = ACTION_EVALUATE;
-      args->path = optarg;
-      args->map[args->argc].arg = optarg;
+      if (args->path == NULL) {
+        args->path = malloc(strlen(optarg) + 1);
+        strcpy(args->path, optarg);
+      }
+      arguments_set_arg(args, optarg);
       args->map[args->argc].action = ACTION_EVALUATE;
       break;
     case 't':
-      args->map[args->argc].arg = optarg;
+      /*args->map[args->argc].arg = optarg;*/
+      arguments_set_arg(args, optarg);
       args->map[args->argc].action = ACTION_EXECUTE_TAG;
       break;
-    case 'h':
-      args->home = optarg;
+    case 'h': {
+      args->home = realloc(args->home, strlen(optarg) + 1);
+      strcpy(args->home, optarg);
       break;
+    }
     case '?': {
       fprintf(stderr,
               "Usage: %s [-r runner_name] [-e file] [-h home_name] [-t "
@@ -53,8 +76,21 @@ Arguments *parse_flags(int argc, char *argv[])
   return args;
 }
 
-void destroy_arguments(Arguments *arg)
+void destroy_arguments(Arguments *args)
 {
-  free(arg->map);
-  free(arg);
+  for (int i = 0; i < args->argc; i++) {
+    if (args->map[i].allocated) {
+      free(args->map[i].arg);
+    }
+  }
+  if (args->home != NULL) {
+    free(args->home);
+  }
+  if (args->path != NULL) {
+    free(args->path);
+  }
+  if (args->map != NULL) {
+    free(args->map);
+  }
+  free(args);
 }

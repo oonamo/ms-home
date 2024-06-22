@@ -11,6 +11,7 @@ typedef enum {
 typedef struct {
   char *arg;
   Action action;
+  int allocated;
 } ArgMap;
 
 typedef struct {
@@ -23,4 +24,7 @@ typedef struct {
 
 void destroy_arguments(Arguments *arg);
 Arguments *parse_flags(int argc, char *argv[]);
+
+void arguments_set_arg(Arguments *args, char *optarg);
+
 #endif
