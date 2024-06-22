@@ -46,11 +46,13 @@ jobs:
     - name: make ms_home
       run: make build_local
     - name: run install script
-      run: ./install.bat
+      run:  |
+        ./install.bat
     - name: check installation
-      run: '& "$Env:APPDATA\ms_home\ms_home.exe" -e ./tests/runner/runner.lua'
-    - name: refresh path and test install
       run: |
         Import-Module "$env:ChocolateyInstall/helpers/chocolateyInstaller.psm1"
         refreshenv
+        '& "$Env:APPDATA\ms_home\ms_home.exe" -e ./tests/runner/runner.lua'
+    - name: refresh path and test install
+      run: |
         ms_home -e ./tests/runner/runner.lua
