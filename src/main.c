@@ -110,11 +110,13 @@ void create_default_conf(const char *path)
 
 static void init_lua_state(lua_State *L)
 {
-  lua_newtable(L);                 // mmh
-  luaL_dofile(L, "lua/home.lua");  // mmh lua functions
+  // TODO: get global instead of returning
+  lua_newtable(L);                 // home
+  luaL_dofile(L, "lua/home.lua");  // home lua functions
+  lua_getglobal(L, "home");
   lua_pushcfunction(L, &l_system);
   lua_setfield(L, -2, "system");
-  lua_setglobal(L, "home");
+  /*lua_setglobal(L, "home");*/
   /* lua_settop(L, 0);                // empty the stack */
   luaL_dofile(L, "lua/utils.lua");  // add utils table to stack
   lua_pushcfunction(L, &get_appearance);

@@ -28,7 +28,7 @@ end
 ---@field create_runner fun(self, name: string, command: fun()|string, tag: string|nil) Create runner for your home with a name and command to be executed. Optionally, add a tag to group similar runners together
 ---@field execute_runner fun(self, name: string)
 ---@field execute_tag fun(self, tag: string)
-local home = {}
+_G.home = {}
 
 function home:new(name, data)
   name = name or "home"
@@ -84,5 +84,3 @@ function home:execute_tag(tag)
     error("did not find tag " .. tag)
   end
 end
-
-return home
