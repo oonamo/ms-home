@@ -168,6 +168,7 @@ int main(int argc, char *argv[])
 {
   Arguments *args = parse_flags(argc, argv);
   char *path = get_conf_path();
+  printf("path: %s\n", path);
   bool err;
 
   if (args->path != NULL)
@@ -201,11 +202,10 @@ int main(int argc, char *argv[])
     error(L, args, "how did we get here\n");
   }
   for (int i = 0; i < args->argc; i++) {
-    const char *home = args->home;
     switch (args->map[i].action) {
     case ACTION_EXECUTE_RUNNER:
     case ACTION_EXECUTE_TAG: {
-      execute_tag_runner(L, args, home, args->map[i].arg, i);
+      execute_tag_runner(L, args, args->home, args->map[i].arg, i);
       break;
     }
     case ACTION_SEND_ARGS:
