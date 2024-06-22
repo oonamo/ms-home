@@ -1,10 +1,12 @@
 INCLUDE_PATH := ./include
 
 after_build:
-	copy include\bin\lua54.dll build\lua54.dll
+	copy /Y include\bin\lua54.dll build\
+
 run_tests: build after_build
 	@ echo "<== Testing ms-home build"
 	creal ./tests/tester.creal
+
 build: after_build
 	@ echo "<== Building ms-home"
 	gcc ./src/main.c -LC:\gcc-lua-install\lua\bin -llua54 -IC:\gcc-lua-install\lua\include -o build/ms_home
