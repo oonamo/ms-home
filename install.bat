@@ -19,7 +19,7 @@ copy /Y "%~dp0build\ms_home.exe" "%INSTALL_DIR%\"
 
 rem Copy dll
 echo "copying %~dp0include\bin\lua54.dll"
-copy /Y "%~dp0include\bin\lua54.dll" "%INSTALL_DIR\"
+copy /Y "%~dp0include\bin\lua54.dll" "%INSTALL_DIR%\"
 
 rem Copy path to a file
 echo %PATH% > "%INSTALL_DIR%\path.bak"
