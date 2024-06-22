@@ -35,7 +35,7 @@ jobs:
     - name: run tests
       run: |
         make test_local
-        if ($LASTEXITCODE -ne 1) {
+        if ($LASTEXITCODE -ne 0) {
           Write-Output "Failed tests"
           exit 1
         }

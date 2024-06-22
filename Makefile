@@ -20,6 +20,12 @@ run: build
 test_local: build_local
 	@ echo "<== Testing local build of ms-home"
 	creal ./tests/tester.creal
+	@if errorlevel 1 \
+		( \
+			echo Program exited 1 & \
+			exit /b 1 \
+		)
+	@ echo Finished tests
 debug:
 	@ echo "<== GCC Debug"
 	@ gcc -L"$(INCLUDE_PATH)/bin" -llua54 -I"$(INCLUDE_PATH)" -g -fno-inline -fno-omit-frame-pointer ./src/main.c -o build/ms_home 
